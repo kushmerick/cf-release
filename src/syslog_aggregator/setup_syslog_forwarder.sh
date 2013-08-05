@@ -14,4 +14,10 @@ chown -R syslog:adm /var/vcap/sys/rsyslog/buffered
 
 cp $CONFIG_DIR/syslog_forwarder.conf /etc/rsyslog.d/00-syslog_forwarder.conf
 
-/usr/sbin/service rsyslog restart
+if [ "`pgrep wsh`" = '1' ]; then
+    # we are in a warden contrainer. Upstart commands are not working.
+    killall rsyslogd || true
+    /usr/sbin/rsyslogd
+else
+    /usr/sbin/service rsyslog restart
+fi
